@@ -2,20 +2,22 @@
 
 export function getAISettings() {
     return {
-        apiKey: localStorage.getItem('anthropic_api_key') || '',
-        model: localStorage.getItem('anthropic_model') || 'claude-3-5-sonnet-20241022'
+        baseUrl: localStorage.getItem('ai_base_url') || 'https://api.anthropic.com',
+        apiKey: localStorage.getItem('ai_api_key') || '',
+        model: localStorage.getItem('ai_model') || 'claude-3-5-sonnet-20241022'
     };
 }
 
-export function saveAISettings(apiKey, model) {
-    localStorage.setItem('anthropic_api_key', apiKey);
-    localStorage.setItem('anthropic_model', model);
+export function saveAISettings(baseUrl, apiKey, model) {
+    localStorage.setItem('ai_base_url', baseUrl);
+    localStorage.setItem('ai_api_key', apiKey);
+    localStorage.setItem('ai_model', model);
 }
 
-export async function streamExplanationFromClaude(apiKey, model, request, onUpdate) {
+export async function streamExplanationFromClaude(baseUrl, apiKey, model, request, onUpdate) {
     const systemPrompt = "You are an expert security researcher and web developer. Explain the following HTTP request in detail, highlighting interesting parameters, potential security implications, and what this request is likely doing. Be concise but thorough.";
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch(baseUrl + '/v1/messages', {
         method: 'POST',
         headers: {
             'x-api-key': apiKey,

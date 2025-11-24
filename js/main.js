@@ -330,8 +330,9 @@ function setupAIFeatures() {
     const settingsBtn = document.getElementById('settings-btn');
     const settingsModal = document.getElementById('settings-modal');
     const saveSettingsBtn = document.getElementById('save-settings-btn');
-    const anthropicApiKeyInput = document.getElementById('anthropic-api-key');
-    const anthropicModelSelect = document.getElementById('anthropic-model');
+    const aiBaseUrlInput = document.getElementById('ai-base-url');
+    const aiApiKeyInput = document.getElementById('ai-api-key');
+    const aiModelInput = document.getElementById('ai-model');
     const aiMenuBtn = document.getElementById('ai-menu-btn');
     const aiMenuDropdown = document.getElementById('ai-menu-dropdown');
     const explainBtn = document.getElementById('explain-btn');
@@ -342,9 +343,10 @@ function setupAIFeatures() {
 
     if (settingsBtn) {
         settingsBtn.addEventListener('click', () => {
-            const { apiKey, model } = getAISettings();
-            anthropicApiKeyInput.value = apiKey;
-            if (anthropicModelSelect) anthropicModelSelect.value = model;
+            const { baseUrl, apiKey, model } = getAISettings();
+            aiApiKeyInput.value = apiKey;
+            aiBaseUrlInput.value = baseUrl;
+            aiModelInput.value = model;
 
             settingsModal.style.display = 'block';
         });
@@ -352,11 +354,12 @@ function setupAIFeatures() {
 
     if (saveSettingsBtn) {
         saveSettingsBtn.addEventListener('click', () => {
-            const key = anthropicApiKeyInput.value.trim();
-            const model = anthropicModelSelect ? anthropicModelSelect.value : 'claude-3-5-sonnet-20241022';
+            const baseUrl = aiBaseUrlInput.value.trim();
+            const key = aiApiKeyInput.value.trim();
+            const model = aiModelInput.value.trim();
 
             if (key) {
-                saveAISettings(key, model);
+                saveAISettings(baseUrl, key, model);
             }
 
             alert('Settings saved!');
@@ -377,7 +380,7 @@ function setupAIFeatures() {
     }
 
     const handleAIRequest = async (promptPrefix, content) => {
-        const { apiKey, model } = getAISettings();
+        const { baseUrl, apiKey, model } = getAISettings();
         if (!apiKey) {
             alert('Please configure your Anthropic API Key in Settings first.');
             settingsModal.style.display = 'block';
@@ -388,7 +391,7 @@ function setupAIFeatures() {
         explanationContent.innerHTML = '<div class="loading-spinner">Generating...</div>';
 
         try {
-            await streamExplanationFromClaude(apiKey, model, promptPrefix + "\n\n" + content, (text) => {
+            await streamExplanationFromClaude(baseUrl, apiKey, model, promptPrefix + "\n\n" + content, (text) => {
                 if (typeof marked !== 'undefined') {
                     explanationContent.innerHTML = marked.parse(text);
                 } else {
